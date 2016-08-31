@@ -21,15 +21,13 @@ setup(
         'numpy',
         'scipy',
         'geopy',
-        'pandas',
-        'ast'
+        'pandas'
     ],
     install_requires=[
         'numpy',
         'scipy',
         'gxeopy',
-        'pandas',
-        'ast'
+        'pandas'
     ],
     description='Fast, offline, osm based reverse geocoder',
     license='MIT',
