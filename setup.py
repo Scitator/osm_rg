@@ -33,5 +33,5 @@ setup(
     ],
     description='Fast, offline, osm based reverse geocoder',
     license='MIT',
-    long_description=read('README.txt')
+    long_description=read('README.md')
 )

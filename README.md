@@ -35,7 +35,8 @@ print results
 The above code will output the following:
 ```
 [{
-    'town': nan, 'village': nan, 
+    'town': nan,
+    'village': nan,
     'country': 'Australia', 
     'city': 'Sydney', 
     'country_code': 'au', 
