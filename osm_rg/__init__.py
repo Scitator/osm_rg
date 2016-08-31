@@ -404,7 +404,7 @@ def search(geo_coords, mode=1, precision_mode=2):
 
 if __name__ == "__main__":
     print("Testing single coordinate through get...")
-    city = (37.78674, -122.39222)
+    city = (-33.86785, 151.20732)
     print("Reverse geocoding 1 city...")
     result = search(city)
     print(result)

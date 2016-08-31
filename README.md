@@ -25,7 +25,7 @@ The library supports two modes:
 ```python
 import osm_rg as rg
 
-city = (37.78674, -122.39222)
+city = (-33.86785, 151.20732)
 
 results = rg.get(city) # default mode = 1, precision = 2
 
@@ -34,7 +34,13 @@ print results
 
 The above code will output the following:
 ```
-
+[{
+    'town': nan, 'village': nan, 
+    'country': 'Australia', 
+    'city': 'Sydney', 
+    'country_code': 'au', 
+    'geo_id': 2147714
+}]
 ```
 
 If you'd like to use the multi-threaded K-D tree, set mode = 2 as follows:
