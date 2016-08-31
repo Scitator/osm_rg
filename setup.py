@@ -26,7 +26,7 @@ setup(
     install_requires=[
         'numpy',
         'scipy',
-        'gxeopy',
+        'geopy',
         'pandas'
     ],
     description='Fast, offline, osm based reverse geocoder',
