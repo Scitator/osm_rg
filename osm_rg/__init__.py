@@ -2,244 +2,243 @@
 # Author: Kolesnikov Sergey
 ##
 import os
-import sys
-import csv
-
 import time
 import click
-
-csv.field_size_limit(sys.maxsize)
 import zipfile
 from scipy.spatial import cKDTree as KDTree
-from osm_rg import cKDTree_MP as KDTree_MP
+# from osm_rg import cKDTree_MP as KDTree_MP
+from cKDTree_MP import cKDTree_MP as KDTree_MP
+
 
 import pandas as pd
 from ast import literal_eval
 from geopy.geocoders import Nominatim as osm_geolocator
 
-GN_URL = 'http://download.geonames.org/export/dump/'
-GN_CITIES1000 = 'cities1000'
-GN_CITIES5000 = 'cities5000'
-GN_CITIES15000 = 'cities15000'
+GN_URL = "http://download.geonames.org/export/dump/"
+GN_CITIES1000 = "cities1000"
+GN_CITIES5000 = "cities5000"
+GN_CITIES15000 = "cities15000"
 
 GN_COLUMNS = {
-    'geoNameId': 0,
-    'name': 1,
-    'asciiName': 2,
-    'alternateNames': 3,
-    'latitude': 4,
-    'longitude': 5,
-    'featureClass': 6,
-    'featureCode': 7,
-    'countryCode': 8,
-    'cc2': 9,
-    'admin1Code': 10,
-    'admin2Code': 11,
-    'admin3Code': 12,
-    'admin4Code': 13,
-    'population': 14,
-    'elevation': 15,
-    'dem': 16,
-    'timezone': 17,
-    'modificationDate': 18
+    "geoNameId": 0,
+    "name": 1,
+    "asciiName": 2,
+    "alternateNames": 3,
+    "latitude": 4,
+    "longitude": 5,
+    "featureClass": 6,
+    "featureCode": 7,
+    "countryCode": 8,
+    "cc2": 9,
+    "admin1Code": 10,
+    "admin2Code": 11,
+    "admin3Code": 12,
+    "admin4Code": 13,
+    "population": 14,
+    "elevation": 15,
+    "dem": 16,
+    "timezone": 17,
+    "modificationDate": 18
 }
 
+GN_COLUMNS_OF_INTEREST = [
+    "geoNameId",
+    "name",
+    "asciiName",
+    "latitude",
+    "longitude"
+]
+
 RG_COLUMNS = [
-    'geo_id',
-    'lat',
-    'lon',
-    'name',
-    'ascii_name',
-    'address'
+    "geo_id",
+    "lat",
+    "lon",
+    "name",
+    "ascii_name",
+    "address"
 ]
 
 OSM_COLUMNS = [
-    'land',
-    'track',
-    'town',
-    'viewpoint',
-    'alcohol',
-    'toilets',
-    'retail',
-    'chalet',
-    'nursing_home',
-    'garden',
-    'junction',
-    'county',
-    'farmyard',
-    'manor',
-    'travel_agency',
-    'electronics',
-    'bus_station',
-    'department_store',
-    'island',
-    'bicycle',
-    'library',
-    'country_code',
-    'taxi',
-    'footway',
-    'castle',
-    'roman_road',
-    'common',
-    'construction',
-    'dentist',
-    'services',
-    'residential',
-    'police',
-    'car',
-    'household',
-    'country',
-    'outdoor',
-    'marina',
-    'caravan_site',
-    'bus_stop',
-    'arts_centre',
-    'grave_yard',
-    'nightclub',
-    'sports_centre',
-    'bridleway',
-    'bicycle_parking',
-    'optician',
-    'butcher',
-    'continent',
-    'pub',
-    'state',
-    'bar',
-    'estate_agent',
-    'hamlet',
-    'road',
-    'pedestrian',
-    'allotments',
-    'fire_station',
-    'prison',
-    'community_centre',
-    'computer',
-    'clinic',
-    'recycling',
-    'supermarket',
-    'beverages',
-    'attraction',
-    'toys',
-    'ferry_terminal',
-    'post_office',
-    'bank',
-    'nature_reserve',
-    'locality',
-    'cinema',
-    'region',
-    'postcode',
-    'doctors',
-    'commercial',
-    'hotel',
-    'newsagent',
-    'clothes',
-    'ruins',
-    'telephone',
-    'courthouse',
-    'dry_cleaning',
-    'place_of_worship',
-    'sports',
-    'traffic_signals',
-    'theatre',
-    'museum',
-    'park',
-    'florist',
-    'guest_house',
-    'fast_food',
-    'pitch',
-    'archaeological_site',
-    'convenience',
-    'industrial',
-    'townhall',
-    'beauty',
-    'kindergarten',
-    'furniture',
-    'memorial',
-    'public_building',
-    'hospital',
-    'pet',
-    'parking',
-    'hairdresser',
-    'hifi',
-    'mobile_phone',
-    'village',
-    'state_district',
-    'administrative',
-    'shop',
-    'veterinary',
-    'house_number',
-    'pharmacy',
-    'car_wash',
-    'city',
-    'post_box',
-    'water',
-    'laundry',
-    'books',
-    'theme_park',
-    'monument',
-    'swimming_pool',
-    'tree',
-    'path',
-    'neighbourhood',
-    'aerodrome',
-    'doityourself',
-    'cycleway',
-    'jewelry',
-    'fort',
-    'cafe',
-    'hostel',
-    'city_district',
-    'bakery',
-    'atm',
-    'house',
-    'shoes',
-    'building',
-    'car_rental',
-    'mall',
-    'stadium',
-    'school',
-    'slipway',
-    'zoo',
-    'chemist',
-    'hardware',
-    'motel',
-    'university',
-    'farm',
-    'college',
-    'fuel',
-    'car_repair',
-    'restaurant',
-    'playground',
-    'garden_centre',
-    'stationery',
-    'wood',
-    'information',
-    'suburb',
-    'artwork',
-    'general'
+    "land",
+    "track",
+    "town",
+    "viewpoint",
+    "alcohol",
+    "toilets",
+    "retail",
+    "chalet",
+    "nursing_home",
+    "garden",
+    "junction",
+    "county",
+    "farmyard",
+    "manor",
+    "travel_agency",
+    "electronics",
+    "bus_station",
+    "department_store",
+    "island",
+    "bicycle",
+    "library",
+    "country_code",
+    "taxi",
+    "footway",
+    "castle",
+    "roman_road",
+    "common",
+    "construction",
+    "dentist",
+    "services",
+    "residential",
+    "police",
+    "car",
+    "household",
+    "country",
+    "outdoor",
+    "marina",
+    "caravan_site",
+    "bus_stop",
+    "arts_centre",
+    "grave_yard",
+    "nightclub",
+    "sports_centre",
+    "bridleway",
+    "bicycle_parking",
+    "optician",
+    "butcher",
+    "continent",
+    "pub",
+    "state",
+    "bar",
+    "estate_agent",
+    "hamlet",
+    "road",
+    "pedestrian",
+    "allotments",
+    "fire_station",
+    "prison",
+    "community_centre",
+    "computer",
+    "clinic",
+    "recycling",
+    "supermarket",
+    "beverages",
+    "attraction",
+    "toys",
+    "ferry_terminal",
+    "post_office",
+    "bank",
+    "nature_reserve",
+    "locality",
+    "cinema",
+    "region",
+    "postcode",
+    "doctors",
+    "commercial",
+    "hotel",
+    "newsagent",
+    "clothes",
+    "ruins",
+    "telephone",
+    "courthouse",
+    "dry_cleaning",
+    "place_of_worship",
+    "sports",
+    "traffic_signals",
+    "theatre",
+    "museum",
+    "park",
+    "florist",
+    "guest_house",
+    "fast_food",
+    "pitch",
+    "archaeological_site",
+    "convenience",
+    "industrial",
+    "townhall",
+    "beauty",
+    "kindergarten",
+    "furniture",
+    "memorial",
+    "public_building",
+    "hospital",
+    "pet",
+    "parking",
+    "hairdresser",
+    "hifi",
+    "mobile_phone",
+    "village",
+    "state_district",
+    "administrative",
+    "shop",
+    "veterinary",
+    "house_number",
+    "pharmacy",
+    "car_wash",
+    "city",
+    "post_box",
+    "water",
+    "laundry",
+    "books",
+    "theme_park",
+    "monument",
+    "swimming_pool",
+    "tree",
+    "path",
+    "neighbourhood",
+    "aerodrome",
+    "doityourself",
+    "cycleway",
+    "jewelry",
+    "fort",
+    "cafe",
+    "hostel",
+    "city_district",
+    "bakery",
+    "atm",
+    "house",
+    "shoes",
+    "building",
+    "car_rental",
+    "mall",
+    "stadium",
+    "school",
+    "slipway",
+    "zoo",
+    "chemist",
+    "hardware",
+    "motel",
+    "university",
+    "farm",
+    "college",
+    "fuel",
+    "car_repair",
+    "restaurant",
+    "playground",
+    "garden_centre",
+    "stationery",
+    "wood",
+    "information",
+    "suburb",
+    "artwork",
+    "general"
 ]
 
 COLUMNS_OF_INTEREST = [
-    'geo_id',
-    'country',
-    'country_code',
-    'city',
-    'town',
-    'village'
+    "geo_id",
+    "country",
+    "country_code",
+    "city",
+    "town",
+    "village"
 ]
 
-RG_FILE_1000 = 'rg_cities1000.csv'
-RG_FILE_5000 = 'rg_cities5000.csv'
-RG_FILE_15000 = 'rg_cities15000.csv'
+RG_FILE_1000 = "rg_cities1000.csv"
+RG_FILE_5000 = "rg_cities5000.csv"
+RG_FILE_15000 = "rg_cities15000.csv"
 
 A = 6378.137  # major axis in kms
 E2 = 0.00669437999014
-
-
-def linecount(filepath):
-    with open(filepath) as f:
-        count = sum(1 for _ in f)
-    return count
 
 
 def singleton(cls):
@@ -312,77 +311,70 @@ class OSM_RG:
         Extract geocode data from zip
         """
         if os.path.exists(local_filename):
-            rows = csv.DictReader(open(local_filename, 'rt'))
-        elif 'rg_cities' in local_filename:
+            df = pd.read_csv(local_filename)
+            # rows = csv.DictReader(open(local_filename, "rt"))
+        elif "rg_cities" in local_filename:
             url_filename = \
                 local_filename[
-                local_filename.rfind('/') + 4:local_filename.rfind('.')]
-            gn_cities_url = GN_URL + url_filename + '.zip'
+                local_filename.rfind("/") + 4:local_filename.rfind(".")]
+            gn_cities_url = GN_URL + url_filename + ".zip"
 
-            cities_zipfilename = url_filename + '.zip'
-            cities_filename = url_filename + '.txt'
+            cities_zipfilename = url_filename + ".zip"
+            cities_filename = url_filename + ".txt"
 
             if not os.path.exists(cities_zipfilename):
                 import urllib.request
                 urllib.request.urlretrieve(gn_cities_url,
                                            cities_zipfilename)
 
-            z = zipfile.ZipFile(open(cities_zipfilename, 'rb'))
-            open(cities_filename, 'wb').write(z.read(cities_filename))
+            z = zipfile.ZipFile(open(cities_zipfilename, "rb"))
+            open(cities_filename, "wb").write(z.read(cities_filename))
 
-            writer = csv.DictWriter(open(local_filename, 'wt'),
-                                    fieldnames=RG_COLUMNS)
+            df = pd.read_csv(cities_filename, delimiter="\t",
+                             names=sorted(GN_COLUMNS, key=GN_COLUMNS.get))
+            df.drop([x for x in GN_COLUMNS if x not in GN_COLUMNS_OF_INTEREST],
+                    axis=1, inplace=True)
 
             geolocator = osm_geolocator()
-
-            rows = []
-
-            with click.progressbar(length=linecount(cities_filename),
-                                   label='reversing geodata') as bar:
-                for row in csv.reader(open(cities_filename, 'rt'),
-                                      delimiter='\t', quoting=csv.QUOTE_NONE):
+            address_list = []
+            with click.progressbar(length=len(df),
+                                   label="reversing geodata") as bar:
+                for i, row in df.iterrows():
                     time.sleep(1)
                     bar.update(1)
-                    geo_id = row[GN_COLUMNS['geoNameId']]
-                    lat = row[GN_COLUMNS['latitude']]
-                    lon = row[GN_COLUMNS['longitude']]
-                    utf_name = row[GN_COLUMNS['name']]
-                    ascii_name = row[GN_COLUMNS['asciiName']]
+                    lat = row["latitude"]
+                    lon = row["longitude"]
 
                     address = None
                     while address is None:
                         try:
                             address = geolocator.reverse(
                                 (lat, lon), timeout=10,
-                                language='en').raw['address']
+                                language="en").raw["address"]
                         except Exception as ex:
                             time.sleep(5)
                             address = None
 
-                    write_row = {
-                        'geo_id': str(geo_id),
-                        'lat': float(lat),
-                        'lon': float(lon),
-                        'name': str(utf_name),
-                        'ascii_name': str(ascii_name),
-                        'address': address
-                    }
-                    rows.append(write_row)
-            writer.writeheader()
-            writer.writerows(rows)
+                    address_list.append(address)
+
+            df["address"] = address_list
+            df.rename(columns={"latitude": "lat",
+                               "longitude": "lon",
+                               "geoNameId": "geo_id"},
+                      inplace=True)
+            df.to_csv(local_filename, index=False)
 
             os.remove(cities_filename)
             os.remove(cities_zipfilename)
 
             parse_address(local_filename)
         else:
-            # Python 3
             raise Exception("Geocoded file not found", local_filename)
 
         # Load all the coordinates and locations
         geo_coords, locations = [], []
-        for row in rows:
-            geo_coords.append((row['lat'], row['lon']))
+        for i, row in df.iterrows():
+            geo_coords.append((float(row["lat"]), float(row["lon"])))
             locations.append(
                 {k: v for k, v in row.items() if k in COLUMNS_OF_INTEREST})
         return geo_coords, locations
@@ -394,7 +386,7 @@ def rel_path(filename):
 
 def get(geo_coord, mode=1, precision_mode=2):
     if type(geo_coord) != tuple or type(geo_coord[0]) != float:
-        raise TypeError('Expecting a tuple')
+        raise TypeError("Expecting a tuple")
 
     rg = OSM_RG(mode=mode, precision_mode=precision_mode)
     return rg.query([geo_coord])[0]
@@ -402,7 +394,7 @@ def get(geo_coord, mode=1, precision_mode=2):
 
 def search(geo_coords, mode=1, precision_mode=2):
     if not isinstance(geo_coords, (tuple, list)):
-        raise TypeError('Expecting a tuple or a tuple/list of tuples')
+        raise TypeError("Expecting a tuple or a tuple/list of tuples")
     elif not isinstance(geo_coords[0], tuple):
         geo_coords = [geo_coords]
 
@@ -410,9 +402,9 @@ def search(geo_coords, mode=1, precision_mode=2):
     return rg.query(geo_coords)
 
 
-if __name__ == '__main__':
-    print('Testing single coordinate through get...')
+if __name__ == "__main__":
+    print("Testing single coordinate through get...")
     city = (37.78674, -122.39222)
-    print('Reverse geocoding 1 city...')
+    print("Reverse geocoding 1 city...")
     result = search(city)
     print(result)
