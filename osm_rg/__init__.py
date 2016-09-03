@@ -7,7 +7,10 @@ import click
 import zipfile
 from scipy.spatial import cKDTree as KDTree
 # from osm_rg import cKDTree_MP as KDTree_MP
-from cKDTree_MP import cKDTree_MP as KDTree_MP
+try: # ide version
+    from osm_rg import cKDTree_MP as KDTree_MP
+except: # script version
+    from cKDTree_MP import cKDTree_MP as KDTree_MP
 
 
 import pandas as pd
@@ -226,11 +229,12 @@ OSM_COLUMNS = [
 
 COLUMNS_OF_INTEREST = [
     "geo_id",
-    "country",
     "country_code",
+    "country",
+    #"state",
     "city",
-    "town",
-    "village"
+    #"town",
+    #"village"
 ]
 
 RG_FILE_1000 = "rg_cities1000.csv"
@@ -244,7 +248,7 @@ E2 = 0.00669437999014
 def singleton(cls):
     instances = {}
 
-    def getinstance(mode=1, precision_mode=2):
+    def getinstance(mode=2, precision_mode=2):
         if cls not in instances:
             instances[cls] = cls(mode=mode,
                                  precision_mode=precision_mode)
@@ -271,7 +275,7 @@ def parse_address(local_filename):
 
 @singleton
 class OSM_RG:
-    def __init__(self, mode=1, precision_mode=2):
+    def __init__(self, mode=2, precision_mode=2):
         self.mode = mode
 
         if precision_mode == 0:
@@ -371,6 +375,7 @@ class OSM_RG:
         else:
             raise Exception("Geocoded file not found", local_filename)
 
+        df.dropna(subset=COLUMNS_OF_INTEREST, inplace=True)
         # Load all the coordinates and locations
         geo_coords, locations = [], []
         for i, row in df.iterrows():
@@ -384,7 +389,7 @@ def rel_path(filename):
     return os.path.join(os.getcwd(), os.path.dirname(__file__), filename)
 
 
-def get(geo_coord, mode=1, precision_mode=2):
+def get(geo_coord, mode=2, precision_mode=2):
     if type(geo_coord) != tuple or type(geo_coord[0]) != float:
         raise TypeError("Expecting a tuple")
 
@@ -392,7 +397,7 @@ def get(geo_coord, mode=1, precision_mode=2):
     return rg.query([geo_coord])[0]
 
 
-def search(geo_coords, mode=1, precision_mode=2):
+def search(geo_coords, mode=2, precision_mode=2):
     if not isinstance(geo_coords, (tuple, list)):
         raise TypeError("Expecting a tuple or a tuple/list of tuples")
     elif not isinstance(geo_coords[0], tuple):
