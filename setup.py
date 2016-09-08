@@ -24,8 +24,7 @@ setup(
         'pandas',
         'click',
         'zipfile',
-        'multiprocessing',
-        'ctypes'
+        'multiprocessing'
     ],
     install_requires=[
         'numpy',
@@ -34,8 +33,7 @@ setup(
         'pandas',
         'click',
         'zipfile',
-        'multiprocessing',
-        'ctypes'
+        'multiprocessing''
     ],
     description='Fast, offline, osm based reverse geocoder',
     license='MIT',
