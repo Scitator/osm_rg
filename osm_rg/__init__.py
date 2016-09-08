@@ -6,7 +6,6 @@ import time
 import click
 import zipfile
 from scipy.spatial import cKDTree as KDTree
-# from osm_rg import cKDTree_MP as KDTree_MP
 try: # ide version
     from osm_rg import cKDTree_MP as KDTree_MP
 except: # script version
@@ -248,7 +247,7 @@ E2 = 0.00669437999014
 def singleton(cls):
     instances = {}
 
-    def getinstance(mode=2, precision_mode=2):
+    def getinstance(mode=1, precision_mode=2):
         if cls not in instances:
             instances[cls] = cls(mode=mode,
                                  precision_mode=precision_mode)
