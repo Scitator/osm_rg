@@ -33,7 +33,7 @@ setup(
         'pandas',
         'click',
         'zipfile',
-        'multiprocessing''
+        'multiprocessing'
     ],
     description='Fast, offline, osm based reverse geocoder',
     license='MIT',
