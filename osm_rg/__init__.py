@@ -275,7 +275,7 @@ def parse_address(local_filename):
 
 @singleton
 class OSM_RG:
-    def __init__(self, mode=2, precision_mode=2):
+    def __init__(self, mode=1, precision_mode=2):
         self.mode = mode
 
         if precision_mode == 0:
@@ -389,7 +389,7 @@ def rel_path(filename):
     return os.path.join(os.getcwd(), os.path.dirname(__file__), filename)
 
 
-def get(geo_coord, mode=2, precision_mode=2):
+def get(geo_coord, mode=1, precision_mode=2):
     if type(geo_coord) != tuple or type(geo_coord[0]) != float:
         raise TypeError("Expecting a tuple")
 
@@ -397,7 +397,7 @@ def get(geo_coord, mode=2, precision_mode=2):
     return rg.query([geo_coord])[0]
 
 
-def search(geo_coords, mode=2, precision_mode=2):
+def search(geo_coords, mode=1, precision_mode=2):
     if not isinstance(geo_coords, (tuple, list)):
         raise TypeError("Expecting a tuple or a tuple/list of tuples")
     elif not isinstance(geo_coords[0], tuple):
