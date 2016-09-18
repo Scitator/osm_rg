@@ -18,22 +18,10 @@ setup(
     package_data={
         'osm_rg': ['rg_cities15000.csv', 'osm_columns.txt', 'osm_data.txt']},
     setup_requires=[
-        'numpy',
-        'scipy',
-        'geopy',
-        'pandas',
-        'click',
-        'zipfile',
-        'multiprocessing'
+        "requirements.txt"
     ],
     install_requires=[
-        'numpy',
-        'scipy',
-        'geopy',
-        'pandas',
-        'click',
-        'zipfile',
-        'multiprocessing'
+        "requirements.txt"
     ],
     description='Fast, offline, osm based reverse geocoder',
     license='MIT',
