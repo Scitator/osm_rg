@@ -22,8 +22,7 @@ setup(
         "pandas",
         "numpy==1.11.0",
         "scipy==0.17.1",
-        "click",
-        "zipfile"
+        "click"
     ],
     description='Fast, offline, osm based reverse geocoder',
     license='MIT',
