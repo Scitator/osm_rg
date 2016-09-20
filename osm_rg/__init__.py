@@ -377,6 +377,7 @@ class OSM_RG:
             raise Exception("Geocoded file not found", local_filename)
 
         df.dropna(subset=COLUMNS_OF_INTEREST, inplace=True)
+        df.drop_duplicates(subset=["city"], inplace=True)
         # Load all the coordinates and locations
         geo_coords, locations = [], []
         for i, row in df.iterrows():
