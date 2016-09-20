@@ -232,6 +232,8 @@ COLUMNS_OF_INTEREST = [
     "country",
     #"state",
     "city",
+    "lat",
+    "lon"
     #"town",
     #"village"
 ]
