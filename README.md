@@ -5,16 +5,11 @@ A Python library for offline reverse geocoding. It improves on an existing libra
 ## Features
 1. Besides city/town and country code, this library also returns the nearest latitude and longitude and also administrative regions 1 and 2.
 2. This library also uses a parallelised implementation of K-D trees which promises an improved performance especially for large inputs.
-3. Many extra information from OSM
-
-The K-D tree is populated with cities that have a population > 1000. The source of the data is [GeoNames](http://download.geonames.org/export/dump/).
 
 ### Dependencies
 1. scipy
 2. numpy
-3. geopy
-4. pandas
-5. ast
+3. pandas
 
 ## Usage
 The library supports two modes:

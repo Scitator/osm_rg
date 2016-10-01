@@ -11,20 +11,18 @@ setup(
     name='osm_rg',
     version='1.0',
     author='Kolesnikov Sergey',
-    author_email='sergey.s.kolesnikov@phystech.edu',
-    url='https://github.com/Scitator/osm_rg',
+    author_email='scitator@gmail.com',
+    url='https://github.com/Scitator/osm_rg@wikidata',
     packages=['osm_rg'],
     package_dir={'osm_rg': './osm_rg'},
     package_data={
-        'osm_rg': ['rg_cities15000.csv', 'osm_columns.txt', 'osm_data.txt']},
+        'osm_rg': ['wikidata_csv.csv']},
     install_requires=[
-        "geopy",
         "pandas",
         "numpy==1.11.0",
         "scipy==0.17.1",
-        "click"
     ],
-    description='Fast, offline, osm based reverse geocoder',
+    description='Fast, offline, wikidata based reverse geocoder',
     license='MIT',
     long_description=read('README.md')
 )
